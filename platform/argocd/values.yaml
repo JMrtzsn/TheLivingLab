@@ -1,0 +1,54 @@
+# ArgoCD - Local/dev deployment configuration
+# Insecure mode (no TLS on server), single replicas, Ingress enabled
+
+global:
+  domain: argocd.localhost
+
+## Server
+server:
+  replicas: 1
+  # Ingress for accessing ArgoCD UI
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hostname: argocd.localhost
+    tls: false
+    extraPaths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              number: 80
+
+## Controller
+controller:
+  replicas: 1
+
+## Repo Server
+repoServer:
+  replicas: 1
+
+## ApplicationSet Controller
+applicationSet:
+  replicas: 1
+
+## Dex (SSO) - disabled for local dev
+dex:
+  enabled: false
+
+## HA Redis - disabled for dev
+redis-ha:
+  enabled: false
+
+## Config
+configs:
+  params:
+    # Run server without TLS (insecure mode)
+    server.insecure: true
+  cm:
+    admin.enabled: "true"
+    # Allow local repository paths (useful for testing)
+    # Timeout for operations
+    timeout.reconciliation: 180s

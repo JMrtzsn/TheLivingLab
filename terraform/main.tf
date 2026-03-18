@@ -1,0 +1,47 @@
+resource "kind_cluster" "living_lab" {
+  name            = var.cluster_name
+  node_image      = var.node_image
+  wait_for_ready  = true
+  kubeconfig_path = pathexpand(var.kubeconfig_path)
+
+  kind_config {
+    kind        = "Cluster"
+    api_version = "kind.x-k8s.io/v1alpha4"
+
+    # Control plane node with ingress port mappings
+    node {
+      role = "control-plane"
+
+      kubeadm_config_patches = [
+        <<-EOT
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+        EOT
+      ]
+
+      # Map host ports 80/443 into the control-plane container
+      # so NGINX Ingress (hostPort mode) is reachable from localhost
+      extra_port_mappings {
+        container_port = 80
+        host_port      = 80
+      }
+
+      extra_port_mappings {
+        container_port = 443
+        host_port      = 443
+      }
+    }
+
+    # Worker node 1
+    node {
+      role = "worker"
+    }
+
+    # Worker node 2
+    node {
+      role = "worker"
+    }
+  }
+}

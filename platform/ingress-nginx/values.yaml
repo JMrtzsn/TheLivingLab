@@ -1,0 +1,45 @@
+# NGINX Ingress Controller - Kind-specific configuration
+# Uses hostPort instead of LoadBalancer (Kind has no cloud LB)
+
+controller:
+  # Use hostPort to bind directly to the node's port 80/443
+  hostPort:
+    enabled: true
+
+  # Disable the default LoadBalancer service (not available in Kind)
+  service:
+    type: NodePort
+
+  # Schedule on the control-plane node that has ingress-ready=true
+  nodeSelector:
+    ingress-ready: "true"
+
+  # Tolerate the control-plane taint so we can schedule there
+  tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
+
+  # Single replica for dev
+  replicaCount: 1
+
+  # Low resource requests for dev
+  resources:
+    requests:
+      cpu: 100m
+      memory: 90Mi
+    limits:
+      memory: 256Mi
+
+  # Watch all namespaces for Ingress resources
+  watchIngressWithoutClass: true
+
+  # Publish status so ArgoCD Ingress gets an address
+  publishService:
+    enabled: false
+
+  # Enable snippet annotations (useful for dev)
+  allowSnippetAnnotations: true
