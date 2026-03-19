@@ -5,7 +5,7 @@ output "endpoint" {
 
 output "kubeconfig_path" {
   description = "Path to the kubeconfig file"
-  value       = pathexpand(var.kubeconfig_path)
+  value       = pathexpand("~/.kube/living-lab-config")
 }
 
 output "kubeconfig" {

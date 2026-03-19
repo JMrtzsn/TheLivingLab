@@ -1,8 +1,8 @@
 resource "kind_cluster" "living_lab" {
-  name            = var.cluster_name
-  node_image      = var.node_image
+  name            = "living-lab"
+  node_image      = "kindest/node:v1.27.1"
   wait_for_ready  = true
-  kubeconfig_path = pathexpand(var.kubeconfig_path)
+  kubeconfig_path = pathexpand("~/.kube/living-lab-config")
 
   kind_config {
     kind        = "Cluster"
