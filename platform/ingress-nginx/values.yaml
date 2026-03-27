@@ -26,6 +26,12 @@ controller:
   # Single replica for dev
   replicaCount: 1
 
+  # Allow downtime during rollouts (hostPort can't run 2 pods on same node)
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+
   # Low resource requests for dev
   resources:
     requests:
